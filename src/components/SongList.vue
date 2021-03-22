@@ -2,7 +2,8 @@
     <div class="songlist list-group">
       <div class="song list-group-item list-group-item-action d-flex"
            v-for="(song ,index) in songs" :key="index">
-        <font-awesome-icon class="trash mr-3 align-self-center" icon="trash" />
+        <font-awesome-icon class="trash mr-3 align-self-center" icon="trash"
+           @click="$emit('handleDelete',song)" />
         <div class="thumbnail" :style="{backgroundImage:'url('+song.thumb+')'}"></div>
         <div class="song-info flex-fill px-2 align-self-center">
             <h4 class="song-info-name mb-0">{{song.name}}
