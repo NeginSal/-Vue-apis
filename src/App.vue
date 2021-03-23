@@ -10,18 +10,20 @@
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import CurrentSong from "@/components/CurrentSong";
 import SongList from "@/components/SongList";
+import axios from "axios";
 import _ from "lodash";
+import {mapState} from "vuex";
 
 
 export default {
   name: "app",
   data(){
     return{
-       currentSong: null,
-       audioElement:null,
-       songs:null,
-                
+       audioElement:null,         
     };
+  },
+  computed: {
+    ...mapState(["songs", "currentSong"])
   },
   methods:{
     handleplay: function(payload) {
@@ -54,12 +56,7 @@ export default {
     }
   },
   created(){
-    fetch("./data.json")
-    .then(response => response.json())
-    .then(response =>{
-      this.songs =response;
-    })
-    .catch(error => console.log(error));
+      this.$store.dispatch("fetchSongs");
   },
   components: {
     FontAwesomeIcon,
