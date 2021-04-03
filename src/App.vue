@@ -1,65 +1,68 @@
 <template>
   <div id="app">
-     <current-song :song="currentSong" v-if="currentsong"/>
-     <song-list :songs="songs" :currentSong="currentSong" @handleplay="handleplay"
-       @handleDelete ="handleDelete"/> 
+    <current-song
+      :song="currentSong"
+      v-if="currentSong"
+    />
+    <song-list
+      :songs="songs"
+      :currentSong="currentSong"
+      @handlePlay="handlePlay"
+      @handleDelete="handleDelete"
+    />
   </div>
 </template>
 
 <script>
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import CurrentSong from "@/components/CurrentSong";
 import SongList from "@/components/SongList";
-import axios from "axios";
 import _ from "lodash";
-import {mapState} from "vuex";
-
-
 export default {
   name: "app",
-  data(){
-    return{
-       audioElement:null,         
+  data() {
+    return {
+      currentSong: null,
+      audioElement: null,
+      songs: null
     };
   },
-  computed: {
-    ...mapState(["songs", "currentSong"])
-  },
-  methods:{
-    handleplay: function(payload) {
-      if (this.audioElement == null){
+  methods: {
+    handlePlay: function(payload) {
+      if (this.audioElement == null) {
         this.audioElement = new Audio(payload.music_url);
         this.audioElement.play();
-      }else{
-        if(payload ==this.currentSong){
-          if(this.audioElement.paused){
+      } else {
+        if (payload == this.currentSong) {
+          if (this.audioElement.paused) {
             this.audioElement.play();
-          }
-          else{
+          } else {
             this.audioElement.pause();
           }
-        }
-        else{
+        } else {
           this.audioElement.src = payload.music_url;
           this.audioElement.play();
         }
       }
       this.currentSong = payload;
-      this.audioElement.addEventListener('ended', ()=>{
+      this.audioElement.addEventListener("ended", () => {
         this.currentSong = null;
         this.audioElement = null;
       });
     },
-    handleDelete:function(payload){
+    handleDelete: function(payload) {
       const updatedArray = _.without(this.songs, payload);
       this.songs = updatedArray;
     }
   },
-  created(){
-      this.$store.dispatch("fetchSongs");
+  created() {
+    fetch("./data.json")
+      .then(response => response.json())
+      .then(response => {
+        this.songs = response;
+      })
+      .catch(error => console.log(error));
   },
   components: {
-    FontAwesomeIcon,
     CurrentSong,
     SongList
   }
@@ -67,36 +70,30 @@ export default {
 </script>
 
 <style lang="scss">
-   @import url('https://fonts.googleapis.com/css2?family=Fjalla+One&family=Open+Sans:wght@300&display=swap');
-   // colors
+@import url("https://fonts.googleapis.com/css?family=Fjalla+One|Open+Sans:300&display=swap");
+// colors
 $primary: #00adb5;
 $secondary: #f8b500;
 $body-bg: #2a2d33;
 $text-body: #fff;
 $body-color: $text-body;
 $border-radius: 8px;
-
 //overrides
-
 $font-family-headlines: "Fjalla One", -apple-system, BlinkMacSystemFont,
   "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
   "Segoe UI Emoji", "Segoe UI Symbol";
 $font-family-base: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
   "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
   "Segoe UI Emoji", "Segoe UI Symbol";
-
 $headings-font-family: $font-family-headlines;
 $headings-font-weight: 400;
 $line-height-base: 1.4;
-
 $list-group-active-bg: #222;
 $list-group-bg: transparent;
 $list-group-border-radius: 0;
 $list-group-hover-bg: #444;
 $list-group-action-color: #bbb;
-
 @import "node_modules/bootstrap/scss/bootstrap";
-
 //currentsong
 .currentsong-background {
   width: 100%;
@@ -112,11 +109,9 @@ $list-group-action-color: #bbb;
   filter: blur(8px) grayscale(50%);
   transform: scale(1.15);
 }
-
 .currentsong .song-info {
   background-color: #000;
 }
-
 .currentsong .song-name {
   font-size: 2.5em;
 }
@@ -124,21 +119,17 @@ $list-group-action-color: #bbb;
   font-size: 0.9em;
   line-height: 120%;
 }
-
 // SongList
 .songlist .song:active {
   background: $gray-700;
 }
-
 .songlist .song-info-name {
   font-size: 1.3em;
   color: $gray-400;
 }
-
 .songlist .song-info-creator {
   font-size: 0.9em;
 }
-
 .songlist .thumbnail {
   width: 60px;
   height: 60px;
@@ -146,20 +137,16 @@ $list-group-action-color: #bbb;
   background-repeat: no-repeat;
   background-size: cover;
 }
-
 .songlist .song .duration {
   color: $secondary;
 }
-
 .songlist .song .trash {
   display: none;
 }
-
 .songlist .song:not(.active):hover .trash {
   display: block;
   cursor: pointer;
 }
-
 .songlist .song .play,
 .songlist .song:hover.active .play {
   display: none;
@@ -171,16 +158,12 @@ $list-group-action-color: #bbb;
 .songlist .song .pause {
   display: none;
 }
-
 .songlist .song:hover.active .pause {
   display: block;
   cursor: pointer;
 }
-
 .songlist .song.active .play,
 .songlist .song.active {
   display: block;
 }
-   @import "node_modules/bootstrap/scss/bootstrap";
-   
 </style>
